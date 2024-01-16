@@ -199,7 +199,7 @@ class Member implements IMember
     public function getInitialBossNotInPrison(): ?IMember
     {
         $boss = $this->getInitialBoss();
-        while ($boss->inPrison()) {
+        while (isset($boss) && $boss->inPrison()) {
             $boss = $boss->getBossFromPrison();
         }
 
@@ -221,6 +221,7 @@ class Member implements IMember
             if (!$subordinate->inPrison()) {
                 $subordinate->getBoss()->removeSubordinate($subordinate);
                 $subordinate->setBoss($this);
+                $subordinate->setInitialSubordinatesNotInPrison();
             }
             else {
                 $this->removeSubordinate($subordinate);

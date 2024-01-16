@@ -197,13 +197,13 @@ class Mafia implements IMafia
             return false;
         }
        
-        // Add new member to the net
+        // Add member to the net
         $this->addMember($member);
         // Release member from prison
         $member->releaseFromPrison();
-        // Set the member's boss from the beginning
+        // Set the member's boss from the beginning Not in prison
         $member->setBoss($member->getInitialBossNotInPrison());
-        // Set member subordinates from the beginning
+        // Set member subordinates from the beginning Not in prison
         $member->setInitialSubordinatesNotInPrison();
 
         return true;
