@@ -1,0 +1,35 @@
+{
+    "name": "aramis/interview",
+    "description": "Aramis Group interviews - Mafia coding test",
+    "license": "proprietary",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Jaume C.",
+            "email": "jaumecx@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Aramis\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Aramis\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=8.0",
+        "phpunit/phpunit": "~9.0"
+    },
+    "scripts": {
+        "test": [
+            "Composer\\Config::disableProcessTimeout",
+            "phpunit"
+        ]
+    }
+}
