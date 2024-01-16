@@ -100,47 +100,30 @@ interface IMember
     public function getBossFromPrison(): ?IMember;
 
     /**
-     * Add member History
-     *
-     * @param IMember $member
-     *
-     * @return void
-     */
-    public function addHistory(): void;
-
-    /**
-     * Get the member's history step Boss
-     *
-     * @param int $step
+     * Get the member's initial Boss
      *
      * @return IMember $boss
      */
-    public function getHistoryBoss(int $step): ?IMember;
+    public function getInitialBoss(): ?IMember;
 
     /**
-     * Get the member's history step Subordinates
-     *
-     * @param int $step
+     * Get the member's initial Subordinates
      *
      * @return IMember[] $subordinates
      */
-    public function getHistorySubordinates(int $step): array;
+    public function getInitialSubordinates(): array;
 
     /**
-     * Get the member's history step Boss not in prison
-     *
-     * @param int $step
+     * Get the member's initial Boss not in prison
      *
      * @return IMember $boss
      */
-    public function getHistoryBossNotInPrison(int $step): ?IMember;
+    public function getInitialBossNotInPrison(): ?IMember;
 
     /**
-     * Get the member's history step Subordinates not in prison
-     *
-     * @param int $step
+     * Get the member's initial Subordinates not in prison
      *
      * @return void
      */
-    public function setHistorySubordinatesNotInPrison(int $step): void;
+    public function setInitialSubordinatesNotInPrison(): void;
 }

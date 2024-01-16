@@ -21,7 +21,6 @@ class Mafia implements IMafia
         $this->addMember($this->setGodfather($godfather));
     }
 
-
     /**
      * Get the godfather of the organisation
      * @return IMember
@@ -30,7 +29,6 @@ class Mafia implements IMafia
     {
         return $this->godfather;
     }
-
 
     /**
      * Set the godfather of the organisation
@@ -42,7 +40,6 @@ class Mafia implements IMafia
 
         return $godfather;
     }
-
 
     /**
      * Add new member to the net
@@ -58,7 +55,6 @@ class Mafia implements IMafia
         return $member;
     }
 
-
     /**
      * Remove member from the net
      *
@@ -73,7 +69,6 @@ class Mafia implements IMafia
         return $member;
     }
 
-
     /**
      * Get a member by id
      *
@@ -85,7 +80,6 @@ class Mafia implements IMafia
     {
         return $this->members[$id] ?? null;
     }
-
 
     /**
      * Put a member in prison
@@ -100,18 +94,9 @@ class Mafia implements IMafia
             return false;
         }
 
-        // Add member History
-        $member->addHistory();
-        // Add history to all of the member's subordinates
-        foreach ($member->getSubordinates() as $subordinate) {
-            $subordinate->addHistory();
-        }
-
         // Remove member from the net
         $this->removeMember($member);
         if (!is_null($member->getBoss())) {
-            // Add member boss History
-            $member->getBoss()->addHistory();
             // Remove the subordinate member from the boss
             $member->getBoss()->removeSubordinate($member);
         }
@@ -120,7 +105,6 @@ class Mafia implements IMafia
 
         return true;
     }
-
 
     /**
      * Restructuring Mafia after a member in prison
@@ -136,12 +120,12 @@ class Mafia implements IMafia
 
         // The member is not the Godfather, Select boss in boss subordinates
         if (isset($currentBoss)) {
-            $boss = $this->selectBoss($currentBoss->getSubordinates(), $member->getId());
+            $boss = $this->selectBossFromSubordinates($currentBoss->getSubordinates(), $member->getId());
         }
 
         // Select boss in member subordinates
         if (!isset($boss)) {
-            $boss = $this->selectBoss($member->getSubordinates());
+            $boss = $this->selectBossFromSubordinates($member->getSubordinates());
             // No subordinates || In prison || All Mafia members in Prison
             if (!isset($boss)) {
                 return false;
@@ -162,7 +146,6 @@ class Mafia implements IMafia
         return true;
     }
 
-
     /**
      * Select the boss from the subordinates who are not in prison
      *
@@ -170,7 +153,7 @@ class Mafia implements IMafia
      *
      * @return IMember $boss
      */
-    private function selectBoss(?array $subordinates): ?IMember
+    private function selectBossFromSubordinates(?array $subordinates): ?IMember
     {
         $boss = null;
         foreach ($subordinates as $subordinate) {
@@ -182,7 +165,6 @@ class Mafia implements IMafia
 
         return $boss;
     }
-
 
     /**
      * Set Boss to all subordinates
@@ -202,7 +184,6 @@ class Mafia implements IMafia
         }
     }
 
-
     /**
      * Release a member from the prison
      *
@@ -220,14 +201,13 @@ class Mafia implements IMafia
         $this->addMember($member);
         // Release member from prison
         $member->releaseFromPrison();
-        // Set member boss from history
-        $member->setBoss($member->getHistoryBossNotInPrison(0));
-        // Set member subordinates from history
-        $member->setHistorySubordinatesNotInPrison(0);
+        // Set the member's boss from the beginning
+        $member->setBoss($member->getInitialBossNotInPrison());
+        // Set member subordinates from the beginning
+        $member->setInitialSubordinatesNotInPrison();
 
         return true;
     }
-
 
     /**
      * Find bosses who have more than required number of subordinates
@@ -248,7 +228,6 @@ class Mafia implements IMafia
         return $bigBosses;
     }
 
-
     /**
      * Get count subordinates recursive
      *
@@ -265,7 +244,6 @@ class Mafia implements IMafia
 
         return $count;
     }
-
 
     /**
      * Compare two members between them and return the one with the highest level or null if they are equals

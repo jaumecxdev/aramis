@@ -9,7 +9,7 @@ class Member implements IMember
     private int $id;
     private int $age;
     private array $subordinates;
-    private array $history;
+    public array $initials;
     private ?IMember $boss;
     private ?IMember $prison;
 
@@ -18,7 +18,7 @@ class Member implements IMember
         $this->id = $id;
         $this->age = $age;
         $this->subordinates = [];
-        $this->history = [];
+        $this->initials = [];
         $this->boss = null;
         $this->prison = null;
     }
@@ -50,10 +50,16 @@ class Member implements IMember
      */
     public function addSubordinate(IMember $subordinate): IMember
     {
+        // Add subordinate to member
         $this->subordinates[$subordinate->getId()] = $subordinate;
+        // Is this the first time this subordinate has a boss?
+        // Set initial member subordinate
+        if (is_null($subordinate->getBoss())) {
+            $this->initials['subordinates'][$subordinate->id] = $subordinate;
+        }
+
         return $subordinate;
     }
-
 
     /**
      * Remove a subordinate
@@ -69,7 +75,6 @@ class Member implements IMember
         return $this;
     }
 
-
     /**
      * Get the list of the subordinates
      * @return IMember[]
@@ -79,7 +84,6 @@ class Member implements IMember
         return $this->subordinates;
     }
     
-
     /**
      * Get his boss
      * @return IMember|null
@@ -88,7 +92,6 @@ class Member implements IMember
     {
         return $this->boss;
     }
-
 
     /**
      * Set boss of the member
@@ -99,14 +102,26 @@ class Member implements IMember
      */
     public function setBoss(?IMember $boss): IMember
     {
-        $this->boss = $boss;
+        // Add boss subordinate
         if (isset($boss)) {
+            // Is this the first time this member has a boss?
+            // Set initial boss subordinate
+            if (is_null($this->getBoss())) {
+                $boss->initials['subordinates'][$this->id] = $this;
+            }
             $boss->addSubordinate($this);
+        }
+
+        // Add boss to member
+        $this->boss = $boss;
+        // Is this the first time this member has a boss?
+        // Set initial boss
+        if (!isset($this->initials['boss'])) {
+            $this->initials['boss'] = $boss;
         }
 
         return $this;
     }
-
 
     /**
      * Send member to prison with the successor boss
@@ -120,7 +135,6 @@ class Member implements IMember
         $this->prison = $boss;
     }
 
-
     /**
      * Release member from prison
      *
@@ -132,7 +146,6 @@ class Member implements IMember
     {
         unset($this->prison);
     }
-
 
     /**
      * Check if member in prison
@@ -146,7 +159,6 @@ class Member implements IMember
         return isset($this->prison);
     }
 
-
     /**
      * Get successor boss from member prison
      *
@@ -159,56 +171,34 @@ class Member implements IMember
         return $this->prison;
     }
 
-
     /**
-     * Add member History
-     *
-     * @param IMember $member
-     *
-     * @return void
-     */
-    public function addHistory(): void
-    {
-        $this->history[] = clone($this);
-    }
-
-
-    /**
-     * Get the member's history step Boss
-     *
-     * @param int $step
+     * Get the member's initial Boss
      *
      * @return IMember $boss
      */
-    public function getHistoryBoss(int $step): ?IMember
+    public function getInitialBoss(): ?IMember
     {
-        return $this->history[$step]?->getBoss();
+        return $this->initials['boss'] ?? null;
     }
 
-
     /**
-     * Get the member's history step Subordinates
-     *
-     * @param int $step
+     * Get the member's initial Subordinates
      *
      * @return IMember[] $subordinates
      */
-    public function getHistorySubordinates(int $step): array
+    public function getInitialSubordinates(): array
     {
-        return $this->history[$step]?->getSubordinates();
+        return $this->initials['subordinates'] ?? [];
     }
 
-
     /**
-     * Get the member's history step Boss not in prison
-     *
-     * @param int $step
+     * Get the member's initial Boss not in prison
      *
      * @return IMember $boss
      */
-    public function getHistoryBossNotInPrison(int $step): ?IMember
+    public function getInitialBossNotInPrison(): ?IMember
     {
-        $boss = $this->getHistoryBoss($step);
+        $boss = $this->getInitialBoss();
         while ($boss->inPrison()) {
             $boss = $boss->getBossFromPrison();
         }
@@ -216,21 +206,18 @@ class Member implements IMember
         return $boss;
     }
 
-
     /**
-     * Get the member's history step Subordinates not in prison
-     *
-     * @param int $step
+     * Get the member's initial Subordinates not in prison
      *
      * @return void
      */
-    public function setHistorySubordinatesNotInPrison(int $step): void
+    public function setInitialSubordinatesNotInPrison(): void
     {
         foreach ($this->getSubordinates() as $subordinate) {
             $this->removeSubordinate($subordinate);
         }
 
-        foreach ($this->getHistorySubordinates($step) as $subordinate) {
+        foreach ($this->getInitialSubordinates() as $subordinate) {
             if (!$subordinate->inPrison()) {
                 $subordinate->getBoss()->removeSubordinate($subordinate);
                 $subordinate->setBoss($this);
