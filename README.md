@@ -4,9 +4,7 @@
 
 Welcome to the recruiting process for Software Engineer in Aramis Group.
 
-You have a maximum of 3 hours to solve this test:
- 
-https://docs.google.com/document/d/1_eB-AuFY-EbAgNSUrjF-mT4BywZoyGocRmQTsjaWJzg/edit?usp=sharing
+You have a maximum of 3 hours to solve this test.
 
 When the time is over, you will have to send a compressed file with all the code generated to solve the test to the responsible who sent the test to you. Don't include the "vendor" folder. It contains binary files so gmail could reject it.
 
