@@ -255,20 +255,28 @@ class Mafia implements IMafia
      */
     public function compareMembers(IMember $memberA, IMember $memberB): ?IMember
     {
-        $countA = 0;
-        $bossA = $memberA->getBoss();
-        while (!is_null($bossA)) {
-            $countA++;
-            $bossA = $bossA->getBoss();
-        }
-
-        $countB = 0;
-        $bossB = $memberB->getBoss();
-        while (!is_null($bossB)) {
-            $countB++;
-            $bossB = $bossB->getBoss();
-        }
+        $countA = $this->getMemberLevel($memberA);
+        $countB = $this->getMemberLevel($memberB);
 
         return $countA > $countB ? $memberB : ($countA < $countB ? $memberA : null);
+    }
+
+    /**
+     * Get the member high level
+     *
+     * @param IMember $member
+     *
+     * @return int
+     */
+    private function getMemberLevel(IMember $member): int
+    {
+        $count = 0;
+        $boss = $member->getBoss();
+        while (!is_null($boss)) {
+            $count++;
+            $boss = $boss->getBoss();
+        }
+
+        return $count;
     }
 }
