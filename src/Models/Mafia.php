@@ -141,7 +141,7 @@ class Mafia implements IMafia
 
         // Send member to prison with the successor boss
         $member->sendToPrison($boss);
-        // Assign the new boss to the member's subordinates
+        // Assign the new boss to the member subordinates
         $this->setBossToSubordinates($boss, $member->getSubordinates());
         return true;
     }
@@ -202,9 +202,9 @@ class Mafia implements IMafia
         // Release member from prison
         $member->releaseFromPrison();
         // Set the member's boss from the beginning Not in prison
-        $member->setBoss($member->getInitialBossNotInPrison());
+        $member->setBoss($member->getBossNotInPrison());
         // Set member subordinates from the beginning Not in prison
-        $member->setInitialSubordinatesNotInPrison();
+        $member->setSubordinatesNotInPrison();
 
         return true;
     }

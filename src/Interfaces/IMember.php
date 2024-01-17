@@ -100,30 +100,16 @@ interface IMember
     public function getBossFromPrison(): ?IMember;
 
     /**
-     * Get the member's initial Boss
-     *
-     * @return IMember $boss
-     */
-    public function getInitialBoss(): ?IMember;
-
-    /**
-     * Get the member's initial Subordinates
-     *
-     * @return IMember[] $subordinates
-     */
-    public function getInitialSubordinates(): array;
-
-    /**
      * Get the member's initial Boss not in prison
      *
      * @return IMember $boss
      */
-    public function getInitialBossNotInPrison(): ?IMember;
+    public function getBossNotInPrison(): ?IMember;
 
     /**
      * Get the member's initial Subordinates not in prison
      *
      * @return void
      */
-    public function setInitialSubordinatesNotInPrison(): void;
+    public function setSubordinatesNotInPrison(): void;
 }

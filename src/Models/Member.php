@@ -9,8 +9,9 @@ class Member implements IMember
     private int $id;
     private int $age;
     private array $subordinates;
-    public array $initials;
+    private array $initialSubordinates;
     private ?IMember $boss;
+    private ?IMember $initialBoss;
     private ?IMember $prison;
 
     public function __construct(int $id, int $age)
@@ -18,8 +19,9 @@ class Member implements IMember
         $this->id = $id;
         $this->age = $age;
         $this->subordinates = [];
-        $this->initials = [];
+        $this->initialSubordinates = [];
         $this->boss = null;
+        $this->initialBoss = null;
         $this->prison = null;
     }
 
@@ -51,12 +53,8 @@ class Member implements IMember
     public function addSubordinate(IMember $subordinate): IMember
     {
         // Add subordinate to member
+        $this->addInitialSubordinate($subordinate);
         $this->subordinates[$subordinate->getId()] = $subordinate;
-        // Is this the first time this subordinate has a boss?
-        // Set initial member subordinate
-        if (is_null($subordinate->getBoss())) {
-            $this->initials['subordinates'][$subordinate->id] = $subordinate;
-        }
 
         return $subordinate;
     }
@@ -104,21 +102,12 @@ class Member implements IMember
     {
         // Add boss subordinate
         if (isset($boss)) {
-            // Is this the first time this member has a boss?
-            // Set initial boss subordinate
-            if (is_null($this->getBoss())) {
-                $boss->initials['subordinates'][$this->id] = $this;
-            }
             $boss->addSubordinate($this);
         }
 
         // Add boss to member
+        $this->setInitialBoss($boss);
         $this->boss = $boss;
-        // Is this the first time this member has a boss?
-        // Set initial boss
-        if (!isset($this->initials['boss'])) {
-            $this->initials['boss'] = $boss;
-        }
 
         return $this;
     }
@@ -172,31 +161,11 @@ class Member implements IMember
     }
 
     /**
-     * Get the member's initial Boss
+     * Get the member Boss not in prison
      *
      * @return IMember $boss
      */
-    public function getInitialBoss(): ?IMember
-    {
-        return $this->initials['boss'] ?? null;
-    }
-
-    /**
-     * Get the member's initial Subordinates
-     *
-     * @return IMember[] $subordinates
-     */
-    public function getInitialSubordinates(): array
-    {
-        return $this->initials['subordinates'] ?? [];
-    }
-
-    /**
-     * Get the member's initial Boss not in prison
-     *
-     * @return IMember $boss
-     */
-    public function getInitialBossNotInPrison(): ?IMember
+    public function getBossNotInPrison(): ?IMember
     {
         $boss = $this->getInitialBoss();
         while (isset($boss) && $boss->inPrison()) {
@@ -207,25 +176,79 @@ class Member implements IMember
     }
 
     /**
-     * Get the member's initial Subordinates not in prison
+     * Get the member Subordinates not in prison
      *
      * @return void
      */
-    public function setInitialSubordinatesNotInPrison(): void
+    public function setSubordinatesNotInPrison(): void
     {
+        // Remove the last subordinates when he went to jail
         foreach ($this->getSubordinates() as $subordinate) {
             $this->removeSubordinate($subordinate);
         }
 
+        // Get initial subordinates not in prison
         foreach ($this->getInitialSubordinates() as $subordinate) {
             if (!$subordinate->inPrison()) {
                 $subordinate->getBoss()->removeSubordinate($subordinate);
                 $subordinate->setBoss($this);
-                $subordinate->setInitialSubordinatesNotInPrison();
+                $subordinate->setSubordinatesNotInPrison();
             }
             else {
                 $this->removeSubordinate($subordinate);
             }
         }
+    }
+
+    /**
+     * Add initial subordinate
+     *
+     * @param IMember $subordinate
+     *
+     * @return void
+     */
+    private function addInitialSubordinate(IMember $subordinate): void
+    {
+        // Is this the first time this subordinate has a boss?
+        // Set initial member subordinate
+        if (is_null($subordinate->getBoss())) {
+            $this->initialSubordinates[$subordinate->id] = $subordinate;
+        }
+    }
+
+    /**
+     * Set initial boss
+     *
+     * @param IMember|null $boss
+     *
+     * @return void
+     */
+    private function setInitialBoss(?IMember $boss): void
+    {
+        // Is this the first time this member has a boss?
+        // Set initial boss
+        if (!isset($this->initialBoss)) {
+            $this->initialBoss = $boss;
+        }
+    }
+
+    /**
+     * Get the member's initial Boss
+     *
+     * @return IMember $boss
+     */
+    private function getInitialBoss(): ?IMember
+    {
+        return $this->initialBoss;
+    }
+
+    /**
+     * Get the member's initial Subordinates
+     *
+     * @return IMember[] $subordinates
+     */
+    private function getInitialSubordinates(): array
+    {
+        return $this->initialSubordinates ?? [];
     }
 }
